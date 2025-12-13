@@ -7,6 +7,7 @@ import com.ml.shubham0204.facenet_android.data.FaceImageRecord
 import com.ml.shubham0204.facenet_android.data.ImagesVectorDB
 import com.ml.shubham0204.facenet_android.data.RecognitionMetrics
 import com.ml.shubham0204.facenet_android.domain.embeddings.FaceNet
+import com.ml.shubham0204.facenet_android.domain.face_detection.BaseFaceDetector
 import com.ml.shubham0204.facenet_android.domain.face_detection.FaceSpoofDetector
 import com.ml.shubham0204.facenet_android.domain.face_detection.MediapipeFaceDetector
 import org.koin.core.annotation.Single
@@ -17,7 +18,7 @@ import kotlin.time.measureTimedValue
 
 @Single
 class ImageVectorUseCase(
-    private val mediapipeFaceDetector: MediapipeFaceDetector,
+    private val faceDetector: BaseFaceDetector,
     private val faceSpoofDetector: FaceSpoofDetector,
     private val imagesVectorDB: ImagesVectorDB,
     private val faceNet: FaceNet,
@@ -35,7 +36,7 @@ class ImageVectorUseCase(
         imageUri: Uri,
     ): Result<Boolean> {
         // Perform face-detection and get the cropped face as a Bitmap
-        val faceDetectionResult = mediapipeFaceDetector.getCroppedFace(imageUri)
+        val faceDetectionResult = faceDetector.getCroppedFace(imageUri)
         if (faceDetectionResult.isSuccess) {
             // Get the embedding for the cropped face, and store it
             // in the database, along with `personId` and `personName`
@@ -61,7 +62,7 @@ class ImageVectorUseCase(
     ): Pair<RecognitionMetrics?, List<FaceRecognitionResult>> {
         // Perform face-detection and get the cropped face as a Bitmap
         val (faceDetectionResult, t1) =
-            measureTimedValue { mediapipeFaceDetector.getAllCroppedFaces(frameBitmap) }
+            measureTimedValue { faceDetector.getAllCroppedFaces(frameBitmap) }
         val faceRecognitionResults = ArrayList<FaceRecognitionResult>()
         var avgT2 = 0L
         var avgT3 = 0L

@@ -114,6 +114,9 @@ dependencies {
     // Mediapipe Face Detection
     implementation(libs.tasks.vision)
 
+    // MLKit Face Detection
+    implementation("com.google.mlkit:face-detection:16.1.7")
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

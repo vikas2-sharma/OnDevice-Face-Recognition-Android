@@ -8,8 +8,28 @@
 
 > Download the APK from the [Releases](https://github.com/shubham0204/OnDevice-Face-Recognition-Android/releases)
 
+- [On-Device Face Recognition In Android ](#on-device-face-recognition-in-android)
+    * [Updates](#updates)
+    * [Goals](#goals)
+    * [Setup](#setup)
+        + [Choosing the FaceNet model](#choosing-the-facenet-model)
+        + [Enable Flat Index Search (Precise NN Search)](#enable-flat-index-search-precise-nn-search)
+        + [Choose Mediapipe or MLKit for face detection](#choose-mediapipe-or-mlkit-for-face-detection)
+    * [Working](#working)
+    * [Tools](#tools)
+    * [Source of TFLite models](#source-of-tflite-models)
+        + [`facenet.tflite` and `facenet_512.tflite`](#facenettflite-and-facenet_512tflite)
+        + [`spoof_model_scale` TFLite models](#spoof_model_scale-tflite-models)
+        + [`blaze_face_short_range` TFLite model](#blaze_face_short_range-tflite-model)
+    * [Discussion](#discussion)
+        + [Implementing face-liveness detection](#implementing-face-liveness-detection)
+        + [How does this project differ from my earlier `FaceRecognition_With_FaceNet_Android` project?](#how-does-this-project-differ-from-my-earlier-facerecognition_with_facenet_android-project)
+            - [Similarities](#similarities)
+            - [Differences](#differences)
+
 ## Updates
 
+* 2025-12: Add new FaceNet models with known sources, enable MLKit for face detection and precise NN-search
 * 2024-09: Add face-spoof detection which uses FASNet from [minivision-ai/Silent-Face-Anti-Spoofing](https://github.com/minivision-ai/Silent-Face-Anti-Spoofing)
 * 2024-07: Add latency metrics on the main screen. It shows the time taken (in milliseconds) to perform face detection, face embedding and vector search.
 
@@ -105,6 +125,26 @@ class FaceDetectionOverlay(
 ```
 
 This triggers a linear-search across all records in the database, which is slower but returns the 'precise' nearest neighbor. The time taken by the linear-search to scan all records is reduced by parallelizing the search over 4 coroutines.
+
+### Choose Mediapipe or MLKit for face detection
+
+The app can be configured to use either Mediapipe or MLKit for face detection. In [`AppModule.kt`](https://github.com/shubham0204/OnDevice-Face-Recognition-Android/blob/main/app/src/main/java/com/ml/shubham0204/facenet_android/di/AppModule.kt), set `isMLKit` to `true` for using MLKit, else set it to `false` for using Mediapipe.
+
+```kotlin
+@Module
+@ComponentScan("com.ml.shubham0204.facenet_android")
+class AppModule {
+
+    private var isMLKit = true
+
+    @Single
+    fun provideFaceDetector(context: Context): BaseFaceDetector = if (isMLKit) {
+        MLKitFaceDetector(context)
+    } else {
+        MediapipeFaceDetector(context)
+    }
+}
+```
 
 ## Working
 
