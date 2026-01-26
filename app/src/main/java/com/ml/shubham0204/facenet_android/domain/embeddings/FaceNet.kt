@@ -17,9 +17,6 @@ import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import org.tensorflow.lite.support.tensorbuffer.TensorBufferFloat
 import java.nio.ByteBuffer
-import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 // Derived from the original project:
 // https://github.com/shubham0204/FaceRecognition_With_FaceNet_Android/blob/master/app/src/main/java/com/ml/quaterion/facenetdetection/model/FaceNetModel.kt
@@ -41,7 +38,7 @@ class FaceNet(
         ImageProcessor
             .Builder()
             .add(ResizeOp(imgSize, imgSize, ResizeOp.ResizeMethod.BILINEAR))
-            .add(StandardizeOp())
+            .add(NormalizeOp())
             .build()
 
     init {
@@ -81,17 +78,9 @@ class FaceNet(
     // Resize the given bitmap and convert it to a ByteBuffer
     private fun convertBitmapToBuffer(image: Bitmap): ByteBuffer = imageTensorProcessor.process(TensorImage.fromBitmap(image)).buffer
 
-    // Op to perform standardization
-    // x' = ( x - mean ) / std_dev
-    class StandardizeOp : TensorOperator {
+    class NormalizeOp : TensorOperator {
         override fun apply(p0: TensorBuffer?): TensorBuffer {
-            val pixels = p0!!.floatArray
-            val mean = pixels.average().toFloat()
-            var std = sqrt(pixels.map { pi -> (pi - mean).pow(2) }.sum() / pixels.size.toFloat())
-            std = max(std, 1f / sqrt(pixels.size.toFloat()))
-            for (i in pixels.indices) {
-                pixels[i] = (pixels[i] - mean) / std
-            }
+            val pixels = p0!!.floatArray.map { it / 255f }.toFloatArray()
             val output = TensorBufferFloat.createFixedSize(p0.shape, DataType.FLOAT32)
             output.loadArray(pixels)
             return output
