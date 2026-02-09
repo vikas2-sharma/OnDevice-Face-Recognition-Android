@@ -181,9 +181,11 @@ class FaceRegisterOverlay(
                 Log.d(TAG, "no of faces: ${results.size}")
                 if (results.isEmpty()) {
                     Log.d(TAG, "No person detected")
+                    return@launch
                 }
                 if (results.size > 1) {
                     Log.d(TAG, "More than one person detected")
+                    return@launch
                 }
                 results.forEach { (name, boundingBox, spoofResult) ->
                     val box = boundingBox.toRectF()
