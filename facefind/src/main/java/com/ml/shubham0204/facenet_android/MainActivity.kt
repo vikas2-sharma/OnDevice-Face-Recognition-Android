@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ml.shubham0204.facenet_android.presentation.screens.add_face.AddFaceScreen
+import com.ml.shubham0204.facenet_android.presentation.screens.add_face.caputre.RegisterFaceScreen
 import com.ml.shubham0204.facenet_android.presentation.screens.detect_screen.DetectScreen
 import com.ml.shubham0204.facenet_android.presentation.screens.face_list.FaceListScreen
 import com.ml.shubham0204.facenet_android.sdk.constants.ROUTE_REGISTER
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("add-face") { AddFaceScreen { navHostController.navigateUp() } }
                 composable("detect") { DetectScreen { navHostController.navigate("face-list") } }
+                composable("register") { RegisterFaceScreen { navHostController.navigate("face-list") } }
                 composable("face-list") {
                     FaceListScreen(
                         onNavigateBack = { navHostController.navigateUp() },
@@ -46,7 +48,7 @@ class MainActivity : ComponentActivity() {
 private fun getStartDestination(targetRoute: String?): String {
     return when (targetRoute) {
         ROUTE_VALIDATE -> "detect"
-        ROUTE_REGISTER -> "add-face"
+        ROUTE_REGISTER -> "register"
         else -> "detect"
     }
 }

@@ -1,4 +1,4 @@
-package com.ml.shubham0204.facenet_android.presentation.screens.detect_screen
+package com.ml.shubham0204.facenet_android.presentation.screens.add_face.caputre
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -48,9 +48,11 @@ import com.ml.shubham0204.facenet_android.R
 import com.ml.shubham0204.facenet_android.presentation.components.AppAlertDialog
 import com.ml.shubham0204.facenet_android.presentation.components.DelayedVisibility
 import com.ml.shubham0204.facenet_android.presentation.components.FaceDetectionOverlay
+import com.ml.shubham0204.facenet_android.presentation.components.FaceRegisterOverlay
 import com.ml.shubham0204.facenet_android.presentation.components.createAlertDialog
 import com.ml.shubham0204.facenet_android.presentation.theme.FaceNetAndroidTheme
 import org.koin.androidx.compose.koinViewModel
+import java.nio.file.WatchEvent
 
 private val cameraPermissionStatus = mutableStateOf(false)
 private val cameraFacing = mutableIntStateOf(CameraSelector.LENS_FACING_BACK)
@@ -58,8 +60,8 @@ private lateinit var cameraPermissionLauncher: ManagedActivityResultLauncher<Str
 
 @kotlin.OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetectScreen(onOpenFaceListClick: (() -> Unit)) {
-    val viewModel: DetectScreenViewModel = koinViewModel()
+fun RegisterFaceScreen(onOpenFaceListClick: (() -> Unit)) {
+    val viewModel: RegisterFaceScreenViewModel = koinViewModel()
     FaceNetAndroidTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -73,12 +75,12 @@ fun DetectScreen(onOpenFaceListClick: (() -> Unit)) {
                         )
                     },
                     actions = {
-                       /* IconButton(onClick = onOpenFaceListClick) {
-                            Icon(
-                                imageVector = Icons.Default.Face,
-                                contentDescription = "Open Face List",
-                            )
-                        }*/
+                        /* IconButton(onClick = onOpenFaceListClick) {
+                             Icon(
+                                 imageVector = Icons.Default.Face,
+                                 contentDescription = "Open Face List",
+                             )
+                         }*/
                         IconButton(
                             onClick = {
                                 viewModel.changeCameraFacing()
@@ -99,9 +101,17 @@ fun DetectScreen(onOpenFaceListClick: (() -> Unit)) {
 }
 
 @Composable
-private fun ScreenUI(viewModel: DetectScreenViewModel) {
-    Box {
+private fun ScreenUI(viewModel: RegisterFaceScreenViewModel) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Camera(viewModel)
+        Button(
+            onClick = {},
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp)
+        ) {
+            Text("Register")
+        }
         DelayedVisibility(viewModel.getNumPeople() > 0) {
             val metrics by remember { viewModel.faceDetectionMetricsState }
             Column {
@@ -116,9 +126,9 @@ private fun ScreenUI(viewModel: DetectScreenViewModel) {
                     Text(
                         text =
                             "face detection: ${it.timeFaceDetection} ms" +
-                                "\nface embedding: ${it.timeFaceEmbedding} ms" +
-                                "\nvector search: ${it.timeVectorSearch} ms\n" +
-                                "spoof detection: ${it.timeFaceSpoofDetection} ms",
+                                    "\nface embedding: ${it.timeFaceEmbedding} ms" +
+                                    "\nvector search: ${it.timeVectorSearch} ms\n" +
+                                    "spoof detection: ${it.timeFaceSpoofDetection} ms",
                         color = Color.White,
                         modifier =
                             Modifier
@@ -148,11 +158,11 @@ private fun ScreenUI(viewModel: DetectScreenViewModel) {
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-private fun Camera(viewModel: DetectScreenViewModel) {
+private fun Camera(viewModel: RegisterFaceScreenViewModel) {
     val context = LocalContext.current
     cameraPermissionStatus.value =
         ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-        PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
     val cameraFacing by remember { viewModel.cameraFacing }
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -168,7 +178,7 @@ private fun Camera(viewModel: DetectScreenViewModel) {
     DelayedVisibility(cameraPermissionStatus.value) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
-            factory = { FaceDetectionOverlay(lifecycleOwner, context, viewModel) },
+            factory = { FaceRegisterOverlay(lifecycleOwner, context, viewModel , {}) },
             update = { it.initializeCamera(cameraFacing) },
         )
     }
