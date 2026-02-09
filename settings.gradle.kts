@@ -20,4 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "FaceNet-Android"
+include(":facefind")
 include(":app")
