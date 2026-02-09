@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.app.open.faceidx.app.databinding.FragmentFirstBinding
+import com.ml.shubham0204.facenet_android.sdk.FaceAuth
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -32,8 +33,11 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+        binding.buttonRegister.setOnClickListener {
+            FaceAuth.getInstance().register(requireActivity())
+        }
+        binding.buttonValidate.setOnClickListener {
+            FaceAuth.getInstance().validate(requireActivity())
         }
     }
 

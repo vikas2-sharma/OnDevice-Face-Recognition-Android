@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.app.open.faceidx.app"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.app.open.faceidx.app"
@@ -40,6 +40,7 @@ android {
 
 dependencies {
 
+    implementation(project(":facefind"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

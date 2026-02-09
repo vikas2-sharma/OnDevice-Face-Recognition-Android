@@ -12,16 +12,21 @@ import androidx.navigation.compose.rememberNavController
 import com.ml.shubham0204.facenet_android.presentation.screens.add_face.AddFaceScreen
 import com.ml.shubham0204.facenet_android.presentation.screens.detect_screen.DetectScreen
 import com.ml.shubham0204.facenet_android.presentation.screens.face_list.FaceListScreen
+import com.ml.shubham0204.facenet_android.sdk.constants.ROUTE_REGISTER
+import com.ml.shubham0204.facenet_android.sdk.constants.ROUTE_VALIDATE
+import com.ml.shubham0204.facenet_android.sdk.constants.TARGET_ROUTE
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val targetRoute = intent.getStringExtra(TARGET_ROUTE)
+
         setContent {
             val navHostController = rememberNavController()
             NavHost(
                 navController = navHostController,
-                startDestination = "detect",
+                startDestination = getStartDestination(targetRoute),
                 enterTransition = { fadeIn() },
                 exitTransition = { fadeOut() },
             ) {
@@ -35,5 +40,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+private fun getStartDestination(targetRoute: String?): String {
+    return when (targetRoute) {
+        ROUTE_VALIDATE -> "detect"
+        ROUTE_REGISTER -> "add-face"
+        else -> "detect"
     }
 }
