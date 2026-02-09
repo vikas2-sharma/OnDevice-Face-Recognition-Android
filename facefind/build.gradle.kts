@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.ml.shubham0204.facenet_android"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
