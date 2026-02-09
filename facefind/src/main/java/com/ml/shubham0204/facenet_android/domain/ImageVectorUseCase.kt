@@ -3,6 +3,7 @@ package com.ml.shubham0204.facenet_android.domain
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.net.Uri
+import android.util.Log
 import com.ml.shubham0204.facenet_android.data.FaceImageRecord
 import com.ml.shubham0204.facenet_android.data.ImagesVectorDB
 import com.ml.shubham0204.facenet_android.data.RecognitionMetrics
@@ -15,6 +16,8 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
+
+private const val TAG = "ImageVectorUseCase"
 
 @Single
 class ImageVectorUseCase(
@@ -54,6 +57,35 @@ class ImageVectorUseCase(
         }
     }
 
+    // Add the person's image to the database from camera
+    suspend fun addImage(
+        personID: Long,
+        personName: String,
+        bitmap: Bitmap,
+    ): Result<String> {
+        // Perform face-detection and get the cropped face as a Bitmap
+        val faceDetectionResult = faceDetector.getAllCroppedFaces(bitmap)
+
+        Log.d(TAG, "addImage: face detection result: ${faceDetectionResult.size}")
+        if (faceDetectionResult.isEmpty()) {
+            Log.d(TAG, "addImage: No face detected")
+            return Result.failure(AppException(ErrorCode.NO_FACE))
+        }
+
+        faceDetectionResult.forEach { face ->
+            val embedding = faceNet.getFaceEmbedding(face.first)
+            imagesVectorDB.addFaceImageRecord(
+                FaceImageRecord(
+                    personID = personID,
+                    personName = personName,
+                    faceEmbedding = embedding,
+                ),
+            )
+        }
+        return Result.success("Face saved successfully")
+    }
+
+
     // From the given frame, return the name of the person by performing
     // face recognition
     suspend fun getNearestPersonName(
@@ -75,7 +107,12 @@ class ImageVectorUseCase(
             avgT2 += t2.toLong(DurationUnit.MILLISECONDS)
             // Perform nearest-neighbor search
             val (recognitionResult, t3) =
-                measureTimedValue { imagesVectorDB.getNearestEmbeddingPersonName(embedding, flatSearch) }
+                measureTimedValue {
+                    imagesVectorDB.getNearestEmbeddingPersonName(
+                        embedding,
+                        flatSearch
+                    )
+                }
             avgT3 += t3.toLong(DurationUnit.MILLISECONDS)
             if (recognitionResult == null) {
                 faceRecognitionResults.add(FaceRecognitionResult("Not recognized", boundingBox))
