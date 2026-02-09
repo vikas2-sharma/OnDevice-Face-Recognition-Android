@@ -181,10 +181,19 @@ class FaceRegisterOverlay(
                 Log.d(TAG, "no of faces: ${results.size}")
                 if (results.isEmpty()) {
                     Log.d(TAG, "No person detected")
+                    this@FaceRegisterOverlay.predictions = emptyArray<Prediction>()
+                    boundingBoxOverlay.invalidate()
+                    isProcessing = false
+
                     return@launch
                 }
                 if (results.size > 1) {
                     Log.d(TAG, "More than one person detected")
+                    this@FaceRegisterOverlay.predictions = emptyArray<Prediction>()
+
+                    boundingBoxOverlay.invalidate()
+                    isProcessing = false
+
                     return@launch
                 }
                 results.forEach { (name, boundingBox, spoofResult) ->
@@ -221,7 +230,7 @@ class FaceRegisterOverlay(
         SurfaceHolder.Callback {
         private val boxPaint =
             Paint().apply {
-                color = Color.parseColor("#4D90caf9")
+                color = Color.parseColor("#4D00ff00")
                 style = Paint.Style.FILL
             }
         private val textPaint =
